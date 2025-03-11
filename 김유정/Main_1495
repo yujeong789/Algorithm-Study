@@ -1,0 +1,60 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    static int N, S, M;
+    static int[] V;
+    
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        S = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        V = new int[N];
+        st = new StringTokenizer(br.readLine());
+        for(int i = 0; i < N; i++) {
+            V[i] = Integer.parseInt(st.nextToken());
+        }
+        
+        int ans = bfs(S);
+        System.out.println(ans);
+    }
+    
+    private static int bfs(int S) {
+        Queue<int[]> que = new LinkedList<>();
+        boolean[][] visited = new boolean[N+1][M+1];
+        // 일관된 배열 순서 사용: [곡 인덱스, 볼륨]
+        que.offer(new int[] {0, S});
+        visited[0][S] = true;
+        
+        int max = -1;
+        while(!que.isEmpty()) {
+            int[] curr = que.poll();
+            // 일관된 인덱스 사용
+            int songIdx = curr[0];
+            int volume = curr[1];
+            
+            if(songIdx == N) {
+                max = Math.max(max, volume);
+                continue;
+            }
+            
+            // 볼륨 올리기
+            int up = volume + V[songIdx];
+            if(up <= M && !visited[songIdx+1][up]) {
+                visited[songIdx+1][up] = true;
+                que.offer(new int[] {songIdx+1, up});
+            }
+            
+            // 볼륨 내리기
+            int down = volume - V[songIdx];
+            if(down >= 0 && !visited[songIdx+1][down]) {
+                visited[songIdx+1][down] = true;
+                que.offer(new int[] {songIdx+1, down});
+            }
+        }
+        
+        return max;
+    }
+}
